@@ -146,50 +146,152 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
   // * RETURN
   // --------------------------------------------------------------------------------------
   return (
-    <div className="fixed inset-0 flex h-full w-full flex-col items-center">
+    <div className="fixed inset-0 flex flex-col overflow-hidden">
       {/* HEADER */}
-      <h1 className="ml-10 mt-7 self-start text-left text-7xl font-bold text-white">
-        LYRA
-        <span
-          className="animate-fade-in align-sub text-5xl opacity-0 duration-500"
-          style={{ animationDuration: "4s" }}
+      <header className="flex h-[8vh] shrink-0 items-center justify-between px-4">
+        <h1 className="ml-10 mt-7 self-start text-left text-7xl font-bold text-white">
+          LYRA
+          <span
+            className="animate-fade-in align-sub text-5xl opacity-0 duration-500"
+            style={{ animationDuration: "4s" }}
+          >
+            {"["}
+          </span>
+          <span
+            className="animate-fade-in inline-block align-sub text-3xl text-indigo-400 opacity-0 duration-1000"
+            style={{ animationDuration: "0.5s" }}
+          >
+            DASHBOARD
+          </span>
+          <span
+            className="animate-fade-in align-sub text-5xl opacity-0"
+            style={{ animationDuration: "4s" }}
+          >
+            {"]"}
+          </span>
+        </h1>
+        <button
+          onClick={handleLogout}
+          className="absolute right-9 top-3 mt-4 cursor-pointer self-end rounded-md border-none bg-transparent px-12 py-4 text-2xl font-semibold text-white outline-none hover:bg-stone-700/40 hover:font-bold hover:text-indigo-400"
         >
-          {"["}
-        </span>
-        <span
-          className="animate-fade-in inline-block align-sub text-3xl text-indigo-400 opacity-0 duration-1000"
-          style={{ animationDuration: "0.5s" }}
-        >
-          DASHBOARD
-        </span>
-        <span
-          className="animate-fade-in align-sub text-5xl opacity-0"
-          style={{ animationDuration: "4s" }}
-        >
-          {"]"}
-        </span>
-      </h1>
-      <h1>Welcome, {session.user?.email}!</h1>
+          Logout
+        </button>
+      </header>
 
-      {/* LOGOUT BUTTON */}
-      <button
-        onClick={handleLogout}
-        className="bg-glassLight/50 hover:bg-glassDark/50 absolute right-9 top-3 mt-4 cursor-pointer self-end rounded-xl border-none px-10 py-3 font-semibold text-white outline-none"
-      >
-        Logout
-      </button>
+      {/* MAIN SECTION */}
+      <main className="mt-5 h-[88vh] p-2 text-white">
+        <div className="grid h-full grid-cols-[1fr_4fr_2fr] gap-2">
+          {/* LEFT COLUMN */}
+          <aside className="flex flex-col gap-2">
+            <section className="magic-card h-auto">
+              <Weather />
+            </section>
+            <section className="magic-card h-auto">
+              <button
+                onClick={handleOpenPopup}
+                className="w-full bg-blue-500 p-2 text-sm text-white hover:bg-blue-600"
+              >
+                + Apply to Job
+              </button>
+            </section>
+            {/* RESUMES CARD */}
+            <section className="magic-card h-auto">
+              <h2 className="card-title">My Resumes</h2>
+              <div className="space-y-1">
+                {resumes.length > 0 ? (
+                  resumes.map((resume) => (
+                    <div
+                      key={resume.id}
+                      className="flex items-center gap-2 text-sm"
+                    >
+                      <img
+                        src="./src/assets/delete2.svg"
+                        alt="delete"
+                        onClick={() =>
+                          handleDeleteResume(resume.id, resume.file_url)
+                        }
+                      />
+                      <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="truncate text-white hover:font-semibold hover:text-indigo-300"
+                      >
+                        {resume.title || "Untitled Resume"}
+                      </a>
+                      <span className="ml-auto text-gray-400">
+                        {resume.created_at
+                          ? new Date(resume.created_at).toLocaleDateString()
+                          : "N/A"}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-gray-400">
+                    No resumes uploaded yet
+                  </p>
+                )}
+              </div>
+            </section>
+          </aside>
 
-      {/* Weather Example */}
-      <section>
-        <Weather />
-      </section>
+          {/* MIDDLE COLUMN */}
 
-      {/* + APPLY TO JOB BUTTON */}
-      <button onClick={handleOpenPopup} className="bg-blue-500 p-2 text-white">
-        + Apply to Job
-      </button>
+          {/* <button
+            type="button"
+            className="h-max w-max cursor-not-allowed rounded-lg bg-indigo-400 font-bold text-white duration-[500ms,800ms] hover:bg-indigo-300 disabled:opacity-50"
+            disabled
+          >
+            <div className="m-[10px] flex items-center justify-center">
+              <div className="h-5 w-5 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+              <div className="ml-2">Processing...</div>
+            </div>
+          </button> */}
 
-      {/* POPUP FOR ADDING APPLICATION */}
+          <section className="grid h-full grid-rows-[3fr_1fr] gap-2">
+            {/* Top Row */}
+            <div className="magic-card">
+              <h2 className="card-title text-3xl">APPLICATIONS</h2>
+              <ResumeUpload onUpload={fetchResumes} />
+            </div>
+
+            {/* Bottom Row - Two Columns */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="magic-card">
+                <p className="card-title">C-Card2</p>
+              </div>
+
+              {/* RECENT ACTIVITY CARD */}
+              <div className="magic-card">
+                <h2 className="card-title">Recent Activity</h2>
+                <div className="text-xs text-gray-300">
+                  Activity feed or other content here
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* RIGHT COLUMN */}
+          <aside className="flex flex-col gap-2">
+            {/* WEATHER COMPONENT */}
+            <section className="magic-card h-1/6">
+              <p className="card-title">R-Card1</p>
+            </section>
+            <section className="magic-card h-1/2">
+              <p className="card-title">R-Card2</p>
+            </section>
+            <section className="magic-card h-1/3">
+              <p className="card-title">R-Card3</p>
+            </section>
+          </aside>
+        </div>
+      </main>
+
+      {/* FOOTER */}
+      <footer className="h-[4vh] shrink-0 px-0 text-center text-white">
+        <p className="text-xs">© 2025 Lyra. All rights reserved.</p>
+      </footer>
+
+      {/* POPUP */}
       {showPopup && (
         <AddApplicationPopup
           resumes={resumes}
@@ -198,49 +300,6 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
           onRefreshData={handleRefreshData}
         />
       )}
-
-      {/* MAIN CONTENT */}
-      <div className="flex flex-grow flex-col items-center justify-center">
-        {/* RESUME UPLOAD */}
-        <section className="bg-glass mt-6 w-full max-w-screen-sm rounded-xl p-4">
-          <h2 className="text-lg font-bold text-white">Resume Upload</h2>
-          <ResumeUpload onUpload={fetchResumes} />
-        </section>
-
-        {/* LIST OF RESUMES */}
-        <section className="bg-glass mt-6 w-full max-w-screen-sm rounded-xl p-4">
-          <h2 className="text-lg font-bold text-white">My Resumes</h2>
-
-          {resumes.length > 0 ? (
-            resumes.map((resume) => (
-              <div key={resume.id} className="mt-4 flex items-center gap-4">
-                <button
-                  onClick={() => handleDeleteResume(resume.id, resume.file_url)}
-                  className="rounded-md bg-red-500 px-2 py-1 text-white hover:bg-red-600"
-                >
-                  Delete
-                </button>
-
-                <a
-                  // href={`${BUCKET_URL}/${resume.file_url}`} // direct link
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:underline"
-                >
-                  {resume.title || "Untitled Resume"}
-                </a>
-                <span className="ml-auto text-sm text-gray-400">
-                  {resume.created_at
-                    ? new Date(resume.created_at).toLocaleDateString()
-                    : "N/A"}
-                </span>
-              </div>
-            ))
-          ) : (
-            <p className="mt-2 text-gray-400">No resumes uploaded yet</p>
-          )}
-        </section>
-      </div>
     </div>
   );
 };

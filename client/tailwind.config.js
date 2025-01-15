@@ -39,5 +39,20 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addComponents }) {
+      addComponents({
+        ".magic-card": {
+          "@apply rounded-md border-none bg-transparent p-8 shadow-lg backdrop-blur-md duration-1000 ease-in-out":
+            {},
+          "&:hover": {
+            "@apply rounded-3xl shadow-2xl shadow-indigo-400/30": {},
+          },
+        },
+        ".card-title": {
+          "@apply mb-4 text-2xl font-bold text-indigo-300": {},
+        },
+      });
+    },
+  ],
 };

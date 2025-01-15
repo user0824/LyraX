@@ -95,23 +95,38 @@ const ResumeUpload: React.FC<ResumeUploadProps> = ({ onUpload }) => {
   // ------------------------------------------------------------------------------------------------
   return (
     <div className="p-4">
-      {/* FILE PICKER */}
-      <input
-        type="file"
-        accept=".pdf"
-        onChange={handleFileChange}
-        className="text-gray-400 file:mr-4 file:cursor-pointer file:rounded-md file:border-0 file:bg-indigo-400/70 file:p-2 file:text-white active:file:bg-indigo-500/70 disabled:cursor-not-allowed disabled:file:opacity-50"
-        disabled={uploading}
-      />
+      {/* Horizontal Layout */}
+      <div className="flex items-center justify-center space-x-4">
+        {/* FILE PICKER */}
+        <input
+          type="file"
+          accept=".pdf"
+          onChange={handleFileChange}
+          className="text-gray-400 file:mr-4 file:cursor-pointer file:rounded-md file:border-0 file:bg-indigo-400/70 file:p-2 file:text-white active:file:bg-indigo-500/70 disabled:cursor-not-allowed disabled:file:opacity-50"
+          disabled={uploading}
+        />
 
-      {/* UPLOAD BUTTON */}
-      <button
-        onClick={handleUpload}
-        className="rounded-md border-0 bg-indigo-400/70 p-2 text-white active:bg-indigo-500/70"
-        disabled={uploading} // Disable button while uploading
-      >
-        {uploading ? "Uploading..." : "Upload Resume"}
-      </button>
+        {/* UPLOAD BUTTON */}
+        <button
+          onClick={handleUpload}
+          className={`h-max w-max cursor-pointer rounded-md border-0 bg-transparent p-2 ${
+            uploading ? "pointer-events-none" : ""
+          }`}
+          disabled={uploading}
+        >
+          {uploading ? (
+            <div className="m-[10px] flex items-center justify-center">
+              <div className="h-5 w-5 animate-spin rounded-full border-4 border-solid border-indigo-400 border-t-transparent"></div>
+            </div>
+          ) : (
+            <img
+              src="./src/assets/upload.svg"
+              alt="upload"
+              className="h-8 w-8" // Adjust size as needed
+            />
+          )}
+        </button>
+      </div>
 
       {/* STATUS MESSAGE */}
       {message && <p className="mt-2">{message}</p>}
