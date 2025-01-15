@@ -1,4 +1,5 @@
 import React from "react";
+import ReactMarkdown from "react-markdown";
 
 interface ResumeAnalysisProps {
   feedback: string | null;
@@ -20,7 +21,10 @@ const ResumeAnalysis: React.FC<ResumeAnalysisProps> = ({ feedback }) => {
         AI Resume Feedback
       </h2>
       {feedback ? (
-        <p>{feedback}</p>
+        // <p className="whitespace-pre-line">{feedback}</p>
+        <ReactMarkdown className="space-y-5 text-left">
+          {feedback}
+        </ReactMarkdown>
       ) : (
         <p className="mt-2 text-gray-400">No feedback available yet.</p>
       )}

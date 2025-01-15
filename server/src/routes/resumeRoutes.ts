@@ -9,17 +9,17 @@ import OpenAI from "openai";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() }); // Setup multer for in-memory file storage
-const openAi = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // ------------------------------------------------------------------------------------------------
 // * INITIALIZE OPENAI
 // ------------------------------------------------------------------------------------------------
+const openAi = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("Missing OPENAI_API_KEY in .env");
 }
 
 // ------------------------------------------------------------------------------------------------
-// * UPLOAD ROUTE - A RESUME FILE, PARSES IT, ANALYZES WITH OPENAI, AND SAVES INFO IN SUPABASE
+// > // UPLOAD ROUTE // - A RESUME FILE, PARSES IT, ANALYZES WITH OPENAI, AND SAVES INFO IN SUPABASE
 // ------------------------------------------------------------------------------------------------
 router.post(
   "/upload",
@@ -85,14 +85,14 @@ router.post(
       // * CALL OPENAI FOR ANALYSIS - Test different models (davinci-002 model did not work)
       // ------------------------------------------------------------------------------------------------
       const analysisResponse = await openAi.chat.completions.create({
-        model: "gpt-4o",
+        model: "o1-mini",
         messages: [
           {
             role: "user",
-            content: `Analyze the following resume and provide feedback:\n\n${resumeText}`,
+            content: `Please provide a high level brief but complete AI feedback on the resume, no more than 150 words. Ensure you cover key sections like Clarity, Organization, Technical Skills, relevant achievements, and how best to optimize it to being ATS compliant, but keep it to 1–2 paragraphs. Analyze the following resume and provide feedback:\n\n${resumeText}`,
           },
         ],
-        max_tokens: 200,
+        // max_tokens: 500,
       });
 
       const analysisFeedback =
@@ -108,8 +108,9 @@ router.post(
           {
             user_id: userId,
             title: req.body.title || file.originalname.split(".")[0],
-            content: resumeText, // the parsed PDF text
-            file_url: file.originalname, // or your stored path
+            content: resumeText, // parsed PDF text
+            // file_url: file.originalname,
+            file_url: uniqueFilename,
             ai_resume_analysis: analysisFeedback,
           },
         ]);
@@ -124,6 +125,7 @@ router.post(
         message: "Resume uploaded successfully",
         fileUrl: signedUrlData?.signedUrl,
         analysisFeedback,
+        insertedResume: dbData,
       });
 
       console.log("Going to upload file with service role..."); // !! DELETE !!
@@ -135,6 +137,56 @@ router.post(
     return;
   },
 );
+
+// ------------------------------------------------------------------------------------------------
+// > // IMPROVE ROUTE // - AI REWRITE RESUME TO ALIGN W/JOB DESCRIPTION; STORE IN DB
+// ------------------------------------------------------------------------------------------------
+router.post("/improve", async (req: Request, res: Response) => {
+  try {
+    const { resumeId, jobDesc, resumeText } = req.body;
+
+    if (!resumeId || !jobDesc || !resumeText) {
+      res.status(400).json({
+        error:
+          "Missing 'resumeId', 'jobDesc' and/or 'resumeText' in request body",
+      });
+      return;
+    }
+
+    const response = await openAi.chat.completions.create({
+      model: "o1-mini",
+      messages: [
+        {
+          role: "user",
+          content: `Here is a resume:\n\n${resumeText}\n\nJob Description:\n${jobDesc}\n\nRewrite this resume so it is ATS compliant and aligned with the job, without losing key details, Return the updated resume.`,
+        },
+      ],
+      // max_tokens: 500,
+    });
+
+    const improvedResume = response.choices?.[0].message?.content?.trim() || "";
+
+    const { data: updatedData, error: updateError } = await supabase
+      .from("resumes")
+      .update({ improved_resume_text: improvedResume })
+      .eq("id", resumeId)
+      .select("*")
+      .single();
+
+    if (updateError) {
+      console.error("Failed to update improved resume in DB:", updateError);
+      res
+        .status(500)
+        .json({ error: "Failed to store improved resume into DB" });
+    }
+
+    res.json({ improvedResume, updatedResume: updatedData });
+    return;
+  } catch (err) {
+    console.error("Error imrpoving resume:", err);
+    res.status(500).send("Error improving resume");
+  }
+});
 
 // ------------------------------------------------------------------------------------------------
 // * MODULE EXPORT

@@ -48,6 +48,7 @@ const App = () => {
 
   // ------------------------------------------------------------------------------------------------
   // !! LOADING SPINNER - Isn't showing as the redirect happens quickly - TO BE DELETED (UNINSTALL package)
+  // !! Add one to Loading while uploading resume + AI Feedback !!
   // ------------------------------------------------------------------------------------------------
   if (loading) {
     return (

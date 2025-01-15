@@ -95,7 +95,7 @@ const ResumeUpload: React.FC<ResumeUploadProps> = ({ onUpload }) => {
   // ------------------------------------------------------------------------------------------------
   return (
     <div className="p-4">
-      {/* File Picker */}
+      {/* FILE PICKER */}
       <input
         type="file"
         accept=".pdf"
@@ -104,7 +104,7 @@ const ResumeUpload: React.FC<ResumeUploadProps> = ({ onUpload }) => {
         disabled={uploading}
       />
 
-      {/* Upload Button */}
+      {/* UPLOAD BUTTON */}
       <button
         onClick={handleUpload}
         className="rounded-md border-0 bg-indigo-400/70 p-2 text-white active:bg-indigo-500/70"
@@ -113,10 +113,10 @@ const ResumeUpload: React.FC<ResumeUploadProps> = ({ onUpload }) => {
         {uploading ? "Uploading..." : "Upload Resume"}
       </button>
 
-      {/* Status Message */}
+      {/* STATUS MESSAGE */}
       {message && <p className="mt-2">{message}</p>}
 
-      {/* AI Analysis Feedback */}
+      {/* AI ANALYSIS FEEDBACK */}
       <ResumeAnalysis feedback={analysisFeedback} />
     </div>
   );

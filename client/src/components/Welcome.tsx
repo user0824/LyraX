@@ -60,7 +60,7 @@ const Welcome: React.FC = () => {
           href="http://localhost:5173/"
           className="text-left text-7xl font-bold text-white hover:text-white"
         >
-          Lyra
+          LYRA
         </a>
       </h1>
 
