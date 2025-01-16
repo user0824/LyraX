@@ -197,7 +197,7 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
             {/* RESUMES CARD */}
             <section className="magic-card h-auto">
               <h2 className="card-title">My Resumes</h2>
-              <div className="space-y-1">
+              <div className="space-y-3">
                 {resumes.length > 0 ? (
                   resumes.map((resume) => (
                     <div

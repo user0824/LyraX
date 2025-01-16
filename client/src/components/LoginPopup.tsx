@@ -112,7 +112,6 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ onClose }) => {
             placeholder="email"
           />
         </div>
-
         {/* PASSWORD FIELD */}
         <div className="relative">
           <input

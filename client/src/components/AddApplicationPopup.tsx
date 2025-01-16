@@ -102,13 +102,13 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
   // --------------------------------------------------------------------------------------
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-zinc-900 bg-opacity-50">
-      {/* The popup container */}
+      {/* POPUP CONTAINER */}
       <div className="w-full max-w-xl rounded-2xl border border-indigo-400/30 bg-white/10 p-8 shadow-2xl backdrop-blur-xl">
         <h2 className="mb-4 text-2xl font-bold">Application</h2>
 
         {errorMsg && <p className="mb-2 text-red-500">{errorMsg}</p>}
 
-        {/* Resume Dropdown */}
+        {/* RESUME DROPDOWN */}
         <label className="ml-2 mt-2 block text-left font-semibold">
           Resume
         </label>
