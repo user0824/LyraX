@@ -3,6 +3,8 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      fontStyle: ["placeholder"],
+      fontWeight: ["placeholder"],
       animation: {
         "fade-in": "fadeIn 1s ease-in forwards 2.5s",
         "fade-in-scale": "fadeInScale 0.3s ease-out forwards",
@@ -50,7 +52,15 @@ export default {
           },
         },
         ".card-title": {
-          "@apply mb-4 text-2xl font-bold text-indigo-300": {},
+          "@apply mb-4 text-2xl font-bold text-indigo-400": {},
+        },
+        ".app-input": {
+          "@apply shadow-glass w-full rounded-xl border-none bg-zinc-700/40 p-2":
+            {},
+        },
+        ".app-title": {
+          "@apply mb-0 ml-2 mt-4 block text-left font-semibold text-lg text-indigo-400":
+            {},
         },
       });
     },

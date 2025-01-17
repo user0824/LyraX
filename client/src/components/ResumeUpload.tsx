@@ -6,7 +6,7 @@ import ResumeAnalysis from "./ResumeAnalysis";
 import { supabase } from "../utils/supabase";
 
 interface ResumeUploadProps {
-  onUpload: () => void; // Prop to trigger parent refresh on successful upload
+  onUpload: (resumeText: string) => void; // Prop to trigger parent refresh on successful upload
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -96,17 +96,17 @@ const ResumeUpload: React.FC<ResumeUploadProps> = ({ onUpload }) => {
   return (
     <div className="p-4">
       {/* Horizontal Layout */}
-      <div className="flex items-center justify-center space-x-4">
+      <div className="flex items-center justify-center space-x-5">
         {/* FILE PICKER */}
         <input
           type="file"
           accept=".pdf"
           onChange={handleFileChange}
-          className="text-gray-400 file:mr-4 file:cursor-pointer file:rounded-md file:border-0 file:bg-indigo-400/70 file:p-2 file:text-white active:file:bg-indigo-500/70 disabled:cursor-not-allowed disabled:file:opacity-50"
+          className="text-gray-400 file:mr-4 file:cursor-pointer file:rounded-2xl file:border-0 file:bg-indigo-400/90 file:px-10 file:py-1 file:font-bold file:text-white hover:file:bg-indigo-500/70 disabled:cursor-not-allowed disabled:file:opacity-50"
           disabled={uploading}
         />
 
-        {/* UPLOAD BUTTON */}
+        {/* UPLOAD BUTTON
         <button
           onClick={handleUpload}
           className={`h-max w-max cursor-pointer rounded-md border-0 bg-transparent p-2 ${
@@ -125,14 +125,14 @@ const ResumeUpload: React.FC<ResumeUploadProps> = ({ onUpload }) => {
               className="h-8 w-8" // Adjust size as needed
             />
           )}
-        </button>
+        </button> */}
       </div>
 
       {/* STATUS MESSAGE */}
       {message && <p className="mt-2">{message}</p>}
 
       {/* AI ANALYSIS FEEDBACK */}
-      <ResumeAnalysis feedback={analysisFeedback} />
+      {/* <ResumeAnalysis feedback={analysisFeedback} /> */}
     </div>
   );
 };

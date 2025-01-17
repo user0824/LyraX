@@ -11,7 +11,8 @@ const router = express.Router();
 // --------------------------------------------------------------------------------------
 router.post("/create", async (req: Request, res: Response): Promise<void> => {
   try {
-    const { userId, companyName, position, description, jobUrl } = req.body;
+    const { userId, companyName, position, description, jobUrl, location } =
+      req.body;
     console.log("Incoming body:", req.body);
 
     // * Insert into Jobs DB table
@@ -24,6 +25,7 @@ router.post("/create", async (req: Request, res: Response): Promise<void> => {
           position,
           description,
           jobUrl,
+          location,
           created_at: new Date(),
         },
       ])

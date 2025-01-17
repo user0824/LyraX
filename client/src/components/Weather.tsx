@@ -132,10 +132,10 @@ const WeatherComponent: React.FC = () => {
         <p>{description}</p>
       )}
       {/* <h2>Current Weather</h2> */}
-      <p className="mb-2 text-5xl font-bold">{temp}°C</p>
-      <p className="mb-2 text-xl">{description}</p>
+      <p className="mb-2 text-5xl font-bold text-indigo-100">{temp}°C</p>
+      <p className="mb-2 text-xl text-indigo-400">{description}</p>
       {locationName ? (
-        <p className="">
+        <p className="text-indigo-100">
           <span></span>
           {locationName}
         </p>

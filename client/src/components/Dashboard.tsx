@@ -142,6 +142,56 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
     return <div>No session found!</div>;
   }
 
+  // > JOB BANK <
+  const jobSearch = [
+    {
+      name: "Linkedin",
+      src: "./src/assets/linkedin2.svg",
+      href: "https://www.linkedin.com",
+      alt: "LinkedIn",
+    },
+    {
+      name: "Indeed",
+      src: "./src/assets/indeed2.svg",
+      href: "https://www.indeed.com",
+      alt: "LinkedIn",
+    },
+    {
+      name: "Glassdoor",
+      src: "./src/assets/glassdoor.svg",
+      href: "https://www.glassdoor.com",
+      alt: "LinkedIn",
+    },
+    {
+      name: "TrueUp",
+      src: "./src/assets/trueup.svg",
+      href: "https://www.trueup.io",
+      alt: "LinkedIn",
+    },
+    {
+      name: "Levels",
+      src: "./src/assets/levels.svg",
+      href: "https://www.levels.fyi",
+      alt: "LinkedIn",
+    },
+  ];
+
+  // > SKILL BUILDING <
+  const skillBuilding = [
+    {
+      name: "Leetcode",
+      src: "./src/assets/leetcode.svg",
+      href: "https://www.leetcode.com/",
+      alt: "Leetcode",
+    },
+    {
+      name: "Educative",
+      src: "./src/assets/educative.svg",
+      href: "https://www.educative.com/",
+      alt: "Leetcode",
+    },
+  ];
+
   // --------------------------------------------------------------------------------------
   // * RETURN
   // --------------------------------------------------------------------------------------
@@ -180,18 +230,16 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
 
       {/* MAIN SECTION */}
       <main className="mt-5 h-[88vh] p-2 text-white">
-        <div className="grid h-full grid-cols-[1fr_4fr_2fr] gap-2">
+        <div className="grid h-full grid-cols-[0fr_8fr_1fr] gap-6">
           {/* LEFT COLUMN */}
           <aside className="flex flex-col gap-2">
-            <section className="magic-card h-auto">
-              <Weather />
-            </section>
+            {/* +APPLICATION BUTTON */}
             <section className="magic-card h-auto">
               <button
                 onClick={handleOpenPopup}
-                className="w-full bg-blue-500 p-2 text-sm text-white hover:bg-blue-600"
+                className="w-full rounded-3xl bg-indigo-400 px-16 text-lg font-bold text-white hover:bg-indigo-500"
               >
-                + Apply to Job
+                NEW
               </button>
             </section>
             {/* RESUMES CARD */}
@@ -214,7 +262,7 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
                       <a
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="truncate text-white hover:font-semibold hover:text-indigo-300"
+                        className="truncate text-white hover:text-indigo-300"
                       >
                         {resume.title || "Untitled Resume"}
                       </a>
@@ -231,6 +279,10 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
                   </p>
                 )}
               </div>
+            </section>
+            {/* ADD SOMETHING HERE within the section; Weather moved to right?!?!?!?!?! */}
+            <section className="magic-card h-auto">
+              <p className="card-title">R-Card1</p>
             </section>
           </aside>
 
@@ -273,14 +325,50 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
           {/* RIGHT COLUMN */}
           <aside className="flex flex-col gap-2">
             {/* WEATHER COMPONENT */}
-            <section className="magic-card h-1/6">
-              <p className="card-title">R-Card1</p>
+            <section className="magic-card h-auto">
+              <Weather />
             </section>
-            <section className="magic-card h-1/2">
-              <p className="card-title">R-Card2</p>
+            {/* JOB SEARCH LINKS */}
+            <section className="magic-card h-auto">
+              <p className="card-title">JOB SEARCH</p>
+              <div className="mt-10 flex flex-col items-center justify-center gap-5">
+                {jobSearch.map((website) => (
+                  <a
+                    title={website.name}
+                    href={website.href}
+                    target="_blank" // open in a new tab
+                    rel="noopener noreferrer" // best practice for external links
+                  >
+                    <img
+                      key={website.name}
+                      src={website.src}
+                      alt={website.alt}
+                      className="h-20 scale-90 cursor-pointer p-1 transition-all duration-500 ease-in-out hover:scale-125"
+                    />
+                  </a>
+                ))}
+              </div>
             </section>
-            <section className="magic-card h-1/3">
-              <p className="card-title">R-Card3</p>
+            {/* SKILL BUILDING */}
+            <section className="magic-card h-auto">
+              <p className="card-title">SKILL BUILDING</p>
+              <div className="mt-10 flex flex-col items-center justify-center gap-5">
+                {skillBuilding.map((skill) => (
+                  <a
+                    title={skill.name}
+                    href={skill.href}
+                    target="_blank" // open in a new tab
+                    rel="noopener noreferrer" // best practice for external links
+                  >
+                    <img
+                      key={skill.name}
+                      src={skill.src}
+                      alt={skill.alt}
+                      className="h-20 scale-90 cursor-pointer p-1 transition-all duration-500 ease-in-out hover:scale-125"
+                    />
+                  </a>
+                ))}
+              </div>
             </section>
           </aside>
         </div>
