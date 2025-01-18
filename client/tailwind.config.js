@@ -55,11 +55,18 @@ export default {
           "@apply mb-4 text-2xl font-bold text-indigo-400": {},
         },
         ".app-input": {
-          "@apply shadow-glass w-full rounded-xl border-none bg-zinc-700/40 p-2":
+          "@apply mb-4 w-full rounded-2xl border border-white/20 bg-white/10 px-2 py-2 text-white placeholder:text-center placeholder:text-white/50 hover:border-indigo-400 focus:border-indigo-400 focus:border-white/30 focus:font-bold focus:outline-none":
             {},
         },
         ".app-title": {
           "@apply mb-0 ml-2 mt-4 block text-left font-semibold text-lg text-indigo-400":
+            {},
+        },
+        ".app-dashboard-title": {
+          "@apply py-3 pl-2 text-indigo-400": {},
+        },
+        ".app-dashboard-row": {
+          "@apply w-auto rounded-lg border border-white/20 bg-white/10 px-3 py-1 text-white placeholder:text-white/50 hover:border-indigo-400 focus:border-indigo-400 focus:outline-none":
             {},
         },
       });

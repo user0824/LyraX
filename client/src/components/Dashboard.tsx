@@ -10,6 +10,7 @@ import { Session } from "@supabase/supabase-js";
 import AddApplicationPopup from "./AddApplicationPopup";
 import axios from "axios";
 import ResumeAnalysis from "./ResumeAnalysis"; // Import ResumeAnalysis
+import ApplicationsTable from "./ApplicationsTable";
 
 const baseUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:3000";
 
@@ -274,7 +275,7 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
         </h1>
         <button
           onClick={handleLogout}
-          className="absolute right-9 top-3 mt-4 cursor-pointer self-end rounded-md border-none bg-transparent px-12 py-4 text-2xl font-semibold text-white outline-none hover:bg-stone-700/40 hover:font-bold hover:text-indigo-400"
+          className="absolute right-9 top-3 mt-4 cursor-pointer self-end rounded-md border-none bg-transparent px-12 py-4 text-2xl font-semibold text-white outline-none hover:bg-stone-800/20 hover:font-bold hover:text-indigo-400"
         >
           Logout
         </button>
@@ -289,7 +290,7 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
             <section className="magic-card h-auto">
               <button
                 onClick={handleOpenPopup}
-                className="w-full rounded-3xl bg-indigo-400 px-16 text-lg font-bold text-white hover:bg-indigo-500"
+                className="w-full rounded-2xl border-white/20 bg-white/10 px-16 text-lg font-bold text-white hover:bg-indigo-600/40"
               >
                 NEW
               </button>
@@ -335,7 +336,9 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
               </div>
             </section>
             <section className="magic-card h-auto">
-              <p className="card-title">L-Card1</p>
+              <div className="mt-6">
+                <ResumeAnalysis feedback={latestFeedback} />
+              </div>
             </section>
           </aside>
 
@@ -343,12 +346,11 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
           <section className="grid h-full grid-rows-[3fr_1fr] gap-2">
             {/* Top Row */}
             <div className="magic-card">
-              <h2 className="card-title text-3xl">APPLICATIONS</h2>
+              <div className="mt-0">
+                {userId && <ApplicationsTable userId={userId} />}
+              </div>
               {/* ResumeUpload is managed via AddApplicationPopup */}
               {/* ResumeAnalysis Component */}
-              <div className="mt-6">
-                <ResumeAnalysis feedback={latestFeedback} />
-              </div>
             </div>
 
             {/* Bottom Row - Two Columns */}
@@ -419,8 +421,8 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
       </main>
 
       {/* FOOTER */}
-      <footer className="h-[4vh] shrink-0 px-0 text-center text-white">
-        <p className="text-xs">© 2025 Lyra. All rights reserved.</p>
+      <footer className="mb-auto h-[4vh] shrink-0 px-0 text-center text-white">
+        <p className="text-xs">© 2025 Amit. All rights reserved.</p>
       </footer>
 
       {/* POPUP */}

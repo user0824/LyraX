@@ -79,12 +79,9 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
       if (isAddNewResume) {
         if (resumeUploadRef.current) {
           console.log("Triggering resume upload...");
-          // TRIGGER THE UPLOAD AND AWAIT ITS COMPLETION
           await resumeUploadRef.current.uploadResume();
-          // FETCH UPDATED RESUMES (the parent might do this in onRefreshData)
           await onRefreshData();
 
-          // Find the newly uploaded resume (assuming it's last or so)
           const updatedResumes = await fetch(
             `${baseUrl}/api/resumes?userId=${userId}`,
           )
@@ -94,7 +91,7 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
               return [];
             });
 
-          const latestResume = updatedResumes[0]; // since we order by created_at DESC
+          const latestResume = updatedResumes[0]; // newest first in array
           if (latestResume) {
             finalResumeId = latestResume.id;
             resumeContent = latestResume.content;
@@ -182,7 +179,7 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
       // ------------------------------------------------------------------
       console.log("Improving resume for applicationId:", createdApplication.id);
       const improvePayload = {
-        applicationId: createdApplication.id, // note we use applicationId now
+        applicationId: createdApplication.id,
         jobDesc,
         resumeText: resumeContent,
       };
@@ -233,17 +230,20 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
   const canSubmit = jobFieldsFilled && haveResume && haveCompany && !loading;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900 bg-opacity-50">
-      <div className="w-full max-w-xl rounded-2xl border border-indigo-400/30 bg-white/10 p-8 shadow-2xl backdrop-blur-xl">
-        <h2 className="mb-4 text-2xl font-bold">Add New Application</h2>
+    <div className="fixed inset-0 flex items-center justify-center bg-black/70">
+      {/* MATCHING LOGINPOPUP WRAPPER STYLE */}
+      <div
+        className="animate-fade-in-scale w-full max-w-xl rounded-2xl border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-md"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="mb-10 text-6xl font-bold text-white">Application</h2>
+
         {errorMsg && <p className="mb-2 text-red-500">{errorMsg}</p>}
 
         {/* RESUME DROPDOWN */}
-        <label className="ml-2 mt-2 block text-left font-semibold">
-          Resume
-        </label>
+        <label className="app-title">Resume</label>
         <select
-          className="w-full rounded-xl border-none bg-black/30 p-2 text-white"
+          className="app-input"
           value={selectedResumeId}
           onChange={(e) => setSelectedResumeId(e.target.value)}
         >
@@ -258,8 +258,8 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
 
         {/* SHOW ResumeUpload IF "ADD NEW RESUME" IS SELECTED */}
         {isAddNewResume && (
-          <div className="mt-4">
-            <p className="mb-2 text-sm text-indigo-300">
+          <div className="mb-4">
+            <p className="mb-2 text-sm text-white/50">
               Upload your new resume:
             </p>
             <ResumeUpload
@@ -267,8 +267,8 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
               onUploadSuccess={(newResume) => {
                 console.log("New resume uploaded:", newResume);
                 if (newResume) {
-                  onRefreshData(); // Refresh resumes in the parent
-                  setSelectedResumeId(newResume.id); // Automatically select the new resume
+                  onRefreshData();
+                  setSelectedResumeId(newResume.id);
                 } else {
                   console.error(
                     "Received undefined resume from onUploadSuccess",
@@ -280,11 +280,9 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
         )}
 
         {/* COMPANY DROPDOWN */}
-        <label className="ml-2 mt-2 block text-left font-semibold">
-          Company
-        </label>
+        <label className="app-title">Company</label>
         <select
-          className="w-full rounded-xl border-none bg-black/30 p-2 text-white"
+          className="app-input"
           value={selectedCompanyId}
           onChange={(e) => setSelectedCompanyId(e.target.value)}
         >
@@ -300,7 +298,7 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
         {/* SHOW INPUT FOR NEW COMPANY NAME IF "ADD NEW COMPANY" IS SELECTED */}
         {isAddNewCompany && (
           <input
-            className="mt-2 w-full rounded-xl border-none bg-black/30 p-2 text-white"
+            className="app-input"
             value={newCompanyName}
             onChange={(e) => setNewCompanyName(e.target.value)}
             placeholder="Enter new company name"
@@ -308,83 +306,77 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
         )}
 
         {/* POSITION */}
-        <label className="ml-2 mt-2 block text-left font-semibold">
-          Position
-        </label>
+        <label className="app-title">Position</label>
         <input
-          className="w-full rounded-xl border-none bg-black/30 p-2 text-white"
+          className="app-input"
           value={position}
           onChange={(e) => setPosition(e.target.value)}
         />
 
         {/* LOCATION */}
-        <label className="ml-2 mt-2 block text-left font-semibold">
-          Location
-        </label>
+        <label className="app-title">Location</label>
         <input
-          className="w-full rounded-xl border-none bg-black/30 p-2 text-white"
+          className="app-input"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
         />
 
         {/* JOB POSTING URL */}
-        <label className="ml-2 mt-2 block text-left font-semibold">
-          Job Posting URL
-        </label>
+        <label className="app-title">Job Posting URL</label>
         <input
-          className="w-full rounded-xl border-none bg-black/30 p-2 text-white"
+          className="app-input"
           value={jobUrl}
           onChange={(e) => setJobUrl(e.target.value)}
         />
 
         {/* DATE APPLIED */}
-        <label className="ml-2 mt-2 block text-left font-semibold">
-          Date Applied
-        </label>
+        <label className="app-title">Date Applied</label>
         <input
           type="date"
-          className="w-full rounded-xl border-none bg-black/30 p-2 text-white"
+          className="app-input"
           value={dateApplied}
           onChange={(e) => setDateApplied(e.target.value)}
         />
 
         {/* JOB DESCRIPTION */}
-        <label className="ml-2 mt-2 block text-left font-semibold">
-          Job Description
-        </label>
+        <label className="app-title">Job Description</label>
         <textarea
           rows={4}
-          className="w-full rounded-xl border-none bg-black/30 p-2 text-white"
+          className="app-input mb-10"
           value={jobDesc}
           onChange={(e) => setJobDesc(e.target.value)}
         />
 
         {/* SUBMIT & ANALYZE BUTTON */}
-        <div className="mt-4 flex justify-end gap-2">
+        <div className="flex justify-end space-x-0">
           <button
             onClick={onClose}
-            className="rounded bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400"
+            className="w-32 rounded-tl-full border border-white/20 bg-white/10 px-6 py-3 font-semibold text-white transition-all duration-500 ease-out hover:bg-gray-600/30 focus:border-white/30 focus:outline-none"
           >
-            Cancel
+            Close
           </button>
           <button
             disabled={!canSubmit}
             onClick={handleSubmit}
-            className={`rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700 ${
-              !canSubmit ? "cursor-not-allowed opacity-50" : ""
+            className={`w-40 rounded-br-full border border-white/20 bg-white/10 px-6 py-3 font-semibold text-white transition-all duration-500 ease-out ${
+              canSubmit
+                ? "hover:bg-indigo-600/40 focus:border-white/30 focus:outline-none"
+                : "cursor-not-allowed opacity-50"
             }`}
           >
-            {loading ? "Processing..." : "Submit & Analyze"}
+            {loading ? "Processing..." : "Analyze"}
           </button>
         </div>
 
         {/* IMPROVED RESUME DISPLAY */}
-        {improvedResume && (
-          <div className="mt-4 border p-2">
-            <h3 className="font-semibold">Improved Resume:</h3>
+        {/* {improvedResume && (
+          <div className="mt-6 rounded-2xl border border-white/20 bg-white/10 p-4 text-white backdrop-blur-sm">
+            <h3 className="mb-2 text-xl font-semibold text-indigo-200">
+              Improved Resume:
+            </h3>
             <pre className="whitespace-pre-wrap">{improvedResume}</pre>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

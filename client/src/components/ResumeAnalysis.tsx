@@ -15,10 +15,6 @@ const ResumeAnalysis: React.FC<ResumeAnalysisProps> = ({ feedback }) => {
   // ------------------------------------------------------------------------------------------------
   return (
     <div>
-      <div className="inline-flex w-full items-center justify-center">
-        <hr className="my-8 h-px w-72 border-0 bg-indigo-400/70" />
-      </div>
-
       {feedback ? (
         <section>
           <h2 className="mb-4 bg-gradient-to-r from-pink-500 via-indigo-400 to-teal-400 bg-clip-text text-2xl font-bold text-transparent">
