@@ -1,4 +1,5 @@
 // server/src/routes/resumeRoutes.ts
+
 import express, { Request, Response } from "express";
 import multer from "multer";
 import pdf from "pdf-parse";
@@ -24,19 +25,19 @@ router.post(
   upload.single("resume"),
   async (req: Request, res: Response): Promise<void> => {
     try {
-      console.log("Incoming request body:", req.body); // !! DELETE !!
-      console.log("Incoming file:", req.file); // !! DELETE !!
+      console.log("Incoming request body:", req.body); // Debug log
+      console.log("Incoming file:", req.file); // Debug log
 
       const file = req.file;
       const userId = req.body.userId;
 
       if (!file) {
-        console.error("No file was uploaded"); // !! DELETE !!
+        console.error("No file was uploaded"); // Debug log
         res.status(400).json({ error: "No file uploaded" });
         return;
       }
       if (!userId) {
-        console.error("userId not provided in request body"); // !! DELETE !!
+        console.error("userId not provided in request body"); // Debug log
         res.status(400).json({ error: "Missing userId in request body" });
         return;
       }
@@ -60,7 +61,7 @@ router.post(
       }
 
       // ------------------------------------------------------------------------------------------------
-      // * GENERATE A SIGNED URL (VALID 1 HOUR) - May not need this as i disabled RLS??
+      // * GENERATE A SIGNED URL (VALID 1 HOUR)
       // ------------------------------------------------------------------------------------------------
       const { data: signedUrlData, error: signUrlError } =
         await supabase.storage
@@ -80,7 +81,7 @@ router.post(
       const resumeText = pdfData.text || "";
 
       // ------------------------------------------------------------------------------------------------
-      // * CALL OPENAI FOR ANALYSIS - Test different models (davinci-002 model did not work)
+      // * CALL OPENAI FOR ANALYSIS
       // ------------------------------------------------------------------------------------------------
       const analysisResponse = await openAi.chat.completions.create({
         model: "o1-mini",
@@ -107,19 +108,21 @@ router.post(
             user_id: userId,
             title: req.body.title || file.originalname.split(".")[0],
             content: resumeText, // parsed PDF text
-            // file_url: file.originalname,
             file_url: uniqueFilename,
+            // improved_resume_text: analysisFeedback, // Consistent field name
             ai_resume_analysis: analysisFeedback,
           },
         ])
-        .select("*") // Add this to return the inserted row
-        .single(); // Ensure a single object is returned
+        .select("*") // Ensure the inserted resume is returned
+        .single(); // Return a single object
 
       if (dbError) {
         console.error("Error saving resume to database:", dbError);
         res.status(500).json({ error: "Failed to save resume" });
         return;
       }
+
+      console.log("Inserted Resume Data:", dbData); // New log
 
       res.status(200).json({
         message: "Resume uploaded successfully",
@@ -128,7 +131,7 @@ router.post(
         insertedResume: dbData, // Now contains the inserted resume
       });
 
-      console.log("Going to upload file with service role..."); // !! DELETE !!
+      console.log("Resume uploaded and processed successfully.");
       return;
     } catch (err) {
       console.error("Error processing resume:", err);
@@ -183,7 +186,7 @@ router.post("/improve", async (req: Request, res: Response) => {
     res.json({ improvedResume, updatedResume: updatedData });
     return;
   } catch (err) {
-    console.error("Error imrpoving resume:", err);
+    console.error("Error improving resume:", err);
     res.status(500).send("Error improving resume");
   }
 });
@@ -203,7 +206,8 @@ router.get("/", async (req: Request, res: Response) => {
     const { data, error } = await supabase
       .from("resumes")
       .select("*")
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .order("created_at", { ascending: true }); // Ensure resumes are ordered
 
     if (error) {
       console.error("Database fetch error:", error);

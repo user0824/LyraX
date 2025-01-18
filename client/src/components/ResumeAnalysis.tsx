@@ -9,6 +9,7 @@ interface ResumeAnalysisProps {
 // > RESUME ANALYSIS COMPONENT < //
 // ------------------------------------------------------------------------------------------------
 const ResumeAnalysis: React.FC<ResumeAnalysisProps> = ({ feedback }) => {
+  console.log("ResumeAnalysis received feedback:", feedback);
   // ------------------------------------------------------------------------------------------------
   // * RETURN
   // ------------------------------------------------------------------------------------------------

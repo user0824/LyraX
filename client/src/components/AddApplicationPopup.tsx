@@ -248,8 +248,14 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
               ref={resumeUploadRef}
               onUploadSuccess={(newResume) => {
                 console.log("New resume uploaded:", newResume);
-                onRefreshData(); // Refresh resumes
-                setSelectedResumeId(newResume.id); // Automatically select the new resume
+                if (newResume) {
+                  onRefreshData(); // Refresh resumes in the parent
+                  setSelectedResumeId(newResume.id); // Automatically select the new resume
+                } else {
+                  console.error(
+                    "Received undefined resume from onUploadSuccess",
+                  );
+                }
               }}
             />
           </div>

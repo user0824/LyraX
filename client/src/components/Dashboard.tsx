@@ -1,6 +1,4 @@
-// --------------------------------------------------------------------------------------
-// > DASHBOARD COMPONENT < //
-// --------------------------------------------------------------------------------------
+// client/src/components/Dashboard.tsx
 
 import React, { useEffect, useState, useCallback } from "react";
 import ResumeUpload from "./ResumeUpload";
@@ -9,6 +7,7 @@ import Weather from "./Weather";
 import { Session } from "@supabase/supabase-js";
 import AddApplicationPopup from "./AddApplicationPopup";
 import axios from "axios";
+import ResumeAnalysis from "./ResumeAnalysis"; // Import ResumeAnalysis
 
 const baseUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:3000";
 
@@ -22,7 +21,8 @@ interface Resume {
   title: string;
   created_at: string;
   content: string;
-  improved_resume_text?: string;
+  improved_resume_text?: string; // Consistent field name
+  ai_resume_analysis?: string;
 }
 
 interface Company {
@@ -34,11 +34,16 @@ interface Company {
   created_at?: string;
 }
 
+// --------------------------------------------------------------------------------------
+// > DASHBOARD COMPONENT < //
+// --------------------------------------------------------------------------------------
+
 const Dashboard: React.FC<DashboardProps> = ({ session }) => {
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [latestFeedback, setLatestFeedback] = useState<string | null>(null); // State for AI feedback
 
   // --------------------------------------------------------------------------------------
   // * FETCH USER ID FROM SUPABASE AUTH
@@ -63,22 +68,37 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
     const { data, error } = await supabase
       .from("resumes")
       .select("*")
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false }); // Ensure resumes are ordered
 
     if (error) {
       console.error("Error fetching resumes:", error.message);
     } else {
       setResumes(data || []);
+      if (data && data.length > 0) {
+        const latestResume = data[0];
+        console.log("Latest Resume:", latestResume); // Log for verification
+        setLatestFeedback(latestResume.ai_resume_analysis || null); // Set latest feedback
+      } else {
+        setLatestFeedback(null);
+      }
     }
   }, [userId]);
 
   // --------------------------------------------------------------------------------------
-  // * FETCH RESUMES FOR THIS USER
+  // * FETCH COMPANIES FOR THIS USER
   // --------------------------------------------------------------------------------------
   useEffect(() => {
     const fetchCompanies = async () => {
-      const res = await axios.get(`${baseUrl}/api/companies?userId=${userId}`);
-      setCompanies(res.data);
+      if (!userId) return;
+      try {
+        const res = await axios.get(
+          `${baseUrl}/api/companies?userId=${userId}`,
+        );
+        setCompanies(res.data);
+      } catch (err) {
+        console.error("Error fetching companies:", err);
+      }
     };
     if (userId) fetchCompanies();
   }, [userId]);
@@ -97,20 +117,20 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
   };
 
   // --------------------------------------------------------------------------------------
-  // * FETCH USER'S ID AND THEIR RESUME; CHECK FOR VALID SESSION
+  // * FETCH USER'S ID AND THEIR RESUMES; CHECK FOR VALID SESSION
   // --------------------------------------------------------------------------------------
   useEffect(() => {
     fetchUserId();
   }, []);
 
-  // once userId is set, fetch resumes
+  // Once userId is set, fetch resumes
   useEffect(() => {
     if (userId) {
       fetchResumes();
     }
   }, [userId, fetchResumes]);
 
-  // check session validity
+  // Check session validity
   useEffect(() => {
     const checkSession = async () => {
       const { data, error } = await supabase.auth.getUser();
@@ -128,11 +148,21 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
   // --------------------------------------------------------------------------------------
   const handleDeleteResume = async (resumeId: string, fileUrl: string) => {
     try {
-      // * remove from storage
+      // * Remove from storage
       const bucket = "resumes";
-      await supabase.storage.from(bucket).remove([fileUrl]);
+      const { error: storageError } = await supabase.storage
+        .from(bucket)
+        .remove([fileUrl]);
 
-      // * remove from DB
+      if (storageError) {
+        console.error(
+          "Error removing file from storage:",
+          storageError.message,
+        );
+        return;
+      }
+
+      // * Remove from DB
       const { error } = await supabase
         .from("resumes")
         .delete()
@@ -143,7 +173,7 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
         return;
       }
 
-      // * re-fetch resumes
+      // * Re-fetch resumes
       await fetchResumes();
     } catch (err) {
       console.error("Unexpected error deleting resume:", err);
@@ -158,7 +188,7 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
 
   // If you want to re-fetch data after the user submits the form
   const handleRefreshData = () => {
-    // e.g., re-fetch resumes or applications
+    // Re-fetch resumes
     fetchResumes();
     setShowPopup(false);
   };
@@ -179,25 +209,25 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
       name: "Indeed",
       src: "./src/assets/indeed2.svg",
       href: "https://www.indeed.com",
-      alt: "LinkedIn",
+      alt: "Indeed",
     },
     {
       name: "Glassdoor",
       src: "./src/assets/glassdoor.svg",
       href: "https://www.glassdoor.com",
-      alt: "LinkedIn",
+      alt: "Glassdoor",
     },
     {
       name: "TrueUp",
       src: "./src/assets/trueup.svg",
       href: "https://www.trueup.io",
-      alt: "LinkedIn",
+      alt: "TrueUp",
     },
     {
       name: "Levels",
       src: "./src/assets/levels.svg",
       href: "https://www.levels.fyi",
-      alt: "LinkedIn",
+      alt: "Levels",
     },
   ];
 
@@ -213,7 +243,7 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
       name: "Educative",
       src: "./src/assets/educative.svg",
       href: "https://www.educative.com/",
-      alt: "Leetcode",
+      alt: "Educative",
     },
   ];
 
@@ -283,11 +313,13 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
                         onClick={() =>
                           handleDeleteResume(resume.id, resume.file_url)
                         }
+                        className="cursor-pointer"
                       />
                       <a
                         target="_blank"
                         rel="noopener noreferrer"
                         className="truncate text-white hover:text-indigo-300"
+                        href={`https://your-supabase-url/storage/v1/object/public/resumes/${resume.file_url}`} // Ensure correct URL
                       >
                         {resume.title || "Untitled Resume"}
                       </a>
@@ -312,23 +344,16 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
           </aside>
 
           {/* MIDDLE COLUMN */}
-
-          {/* <button
-            type="button"
-            className="h-max w-max cursor-not-allowed rounded-lg bg-indigo-400 font-bold text-white duration-[500ms,800ms] hover:bg-indigo-300 disabled:opacity-50"
-            disabled
-          >
-            <div className="m-[10px] flex items-center justify-center">
-              <div className="h-5 w-5 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
-              <div className="ml-2">Processing...</div>
-            </div>
-          </button> */}
-
           <section className="grid h-full grid-rows-[3fr_1fr] gap-2">
             {/* Top Row */}
             <div className="magic-card">
               <h2 className="card-title text-3xl">APPLICATIONS</h2>
-              <ResumeUpload onUpload={fetchResumes} />
+              {/* ResumeUpload is managed via AddApplicationPopup */}
+
+              {/* ResumeAnalysis Component */}
+              <div className="mt-6">
+                <ResumeAnalysis feedback={latestFeedback} />
+              </div>
             </div>
 
             {/* Bottom Row - Two Columns */}
@@ -359,13 +384,13 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
               <div className="mt-10 flex flex-col items-center justify-center gap-5">
                 {jobSearch.map((website) => (
                   <a
+                    key={website.name} // Added key here for React list rendering
                     title={website.name}
                     href={website.href}
                     target="_blank" // open in a new tab
                     rel="noopener noreferrer" // best practice for external links
                   >
                     <img
-                      key={website.name}
                       src={website.src}
                       alt={website.alt}
                       className="h-20 scale-90 cursor-pointer p-1 transition-all duration-500 ease-in-out hover:scale-125"
@@ -380,13 +405,13 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
               <div className="mt-10 flex flex-col items-center justify-center gap-5">
                 {skillBuilding.map((skill) => (
                   <a
+                    key={skill.name} // Added key here for React list rendering
                     title={skill.name}
                     href={skill.href}
                     target="_blank" // open in a new tab
                     rel="noopener noreferrer" // best practice for external links
                   >
                     <img
-                      key={skill.name}
                       src={skill.src}
                       alt={skill.alt}
                       className="h-20 scale-90 cursor-pointer p-1 transition-all duration-500 ease-in-out hover:scale-125"
