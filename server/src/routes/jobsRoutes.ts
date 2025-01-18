@@ -9,19 +9,24 @@ const router = express.Router();
 // --------------------------------------------------------------------------------------
 // * CREATE JOB ROUTE
 // --------------------------------------------------------------------------------------
-router.post("/create", async (req: Request, res: Response): Promise<void> => {
+router.post("/create", async (req: Request, res: Response) => {
   try {
-    const { userId, companyName, position, description, jobUrl, location } =
-      req.body;
-    console.log("Incoming body:", req.body);
+    const {
+      userId,
+      companyId, // Now we expect an actual ID referencing 'companies'.
+      position,
+      description,
+      jobUrl,
+      location,
+    } = req.body;
 
-    // * Insert into Jobs DB table
+    // Insert the job referencing 'companyId'
     const { data, error } = await supabase
       .from("jobs")
       .insert([
         {
-          user_id: req.body.userId,
-          company_name: companyName,
+          user_id: userId,
+          company_id: companyId, // references 'companies(id)'
           position,
           description,
           jobUrl,
@@ -37,7 +42,6 @@ router.post("/create", async (req: Request, res: Response): Promise<void> => {
       res.status(500).json({ error: "Error creating job" });
       return;
     }
-
     res.status(200).json({ job: data });
     return;
   } catch (err) {

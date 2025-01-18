@@ -8,6 +8,7 @@ import weatherRoutes from "./weatherRoutes";
 import resumeRoutes from "./resumeRoutes";
 import jobsRoutes from "./jobsRoutes";
 import applicationRoutes from "./applicationRoutes";
+import companyRoutes from "./companyRoutes";
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.use("/weather", weatherRoutes);
 router.use("/resumes", resumeRoutes);
 router.use("/jobs", jobsRoutes);
 router.use("/applications", applicationRoutes);
+router.use("/companies", companyRoutes);
 
 // ------------------------------------------------------------------------------------------------
 // * MODULE EXPORT

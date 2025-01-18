@@ -1,9 +1,16 @@
+// --------------------------------------------------------------------------------------
+// > DASHBOARD COMPONENT < //
+// --------------------------------------------------------------------------------------
+
 import React, { useEffect, useState, useCallback } from "react";
 import ResumeUpload from "./ResumeUpload";
 import { supabase } from "../utils/supabase";
 import Weather from "./Weather";
 import { Session } from "@supabase/supabase-js";
 import AddApplicationPopup from "./AddApplicationPopup";
+import axios from "axios";
+
+const baseUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:3000";
 
 interface DashboardProps {
   session: Session | null; // * match App.tsx
@@ -18,13 +25,20 @@ interface Resume {
   improved_resume_text?: string;
 }
 
-// --------------------------------------------------------------------------------------
-// > DASHBOARD COMPONENT < //
-// --------------------------------------------------------------------------------------
+interface Company {
+  id: string;
+  user_id: string;
+  name: string;
+  industry?: string;
+  notes?: string;
+  created_at?: string;
+}
+
 const Dashboard: React.FC<DashboardProps> = ({ session }) => {
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [companies, setCompanies] = useState<Company[]>([]);
 
   // --------------------------------------------------------------------------------------
   // * FETCH USER ID FROM SUPABASE AUTH
@@ -56,6 +70,17 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
     } else {
       setResumes(data || []);
     }
+  }, [userId]);
+
+  // --------------------------------------------------------------------------------------
+  // * FETCH RESUMES FOR THIS USER
+  // --------------------------------------------------------------------------------------
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      const res = await axios.get(`${baseUrl}/api/companies?userId=${userId}`);
+      setCompanies(res.data);
+    };
+    if (userId) fetchCompanies();
   }, [userId]);
 
   // --------------------------------------------------------------------------------------
@@ -382,8 +407,9 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
       {/* POPUP */}
       {showPopup && (
         <AddApplicationPopup
-          resumes={resumes}
           userId={userId!}
+          resumes={resumes}
+          companies={companies}
           onClose={handleClosePopup}
           onRefreshData={handleRefreshData}
         />

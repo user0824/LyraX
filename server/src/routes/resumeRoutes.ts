@@ -1,6 +1,4 @@
-// ------------------------------------------------------------------------------------------------
-// > RESUME ROUTES < //
-// ------------------------------------------------------------------------------------------------
+// server/src/routes/resumeRoutes.ts
 import express, { Request, Response } from "express";
 import multer from "multer";
 import pdf from "pdf-parse";
@@ -113,7 +111,9 @@ router.post(
             file_url: uniqueFilename,
             ai_resume_analysis: analysisFeedback,
           },
-        ]);
+        ])
+        .select("*") // Add this to return the inserted row
+        .single(); // Ensure a single object is returned
 
       if (dbError) {
         console.error("Error saving resume to database:", dbError);
@@ -125,7 +125,7 @@ router.post(
         message: "Resume uploaded successfully",
         fileUrl: signedUrlData?.signedUrl,
         analysisFeedback,
-        insertedResume: dbData,
+        insertedResume: dbData, // Now contains the inserted resume
       });
 
       console.log("Going to upload file with service role..."); // !! DELETE !!
@@ -185,6 +185,36 @@ router.post("/improve", async (req: Request, res: Response) => {
   } catch (err) {
     console.error("Error imrpoving resume:", err);
     res.status(500).send("Error improving resume");
+  }
+});
+
+// ------------------------------------------------------------------------------------------------
+// * GET RESUMES ROUTE - FETCH RESUMES BY USER ID
+// ------------------------------------------------------------------------------------------------
+router.get("/", async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId || typeof userId !== "string") {
+      res.status(400).json({ error: "Missing or invalid userId parameter." });
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("resumes")
+      .select("*")
+      .eq("user_id", userId);
+
+    if (error) {
+      console.error("Database fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch resumes." });
+      return;
+    }
+
+    res.status(200).json(data);
+  } catch (err) {
+    console.error("Error fetching resumes:", err);
+    res.status(500).json({ error: "Failed to fetch resumes." });
   }
 });
 

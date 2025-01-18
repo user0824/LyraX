@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// > LOGINPOPUP COMPONENT < //
+// ------------------------------------------------------------------------------------------------
+
 import React, { useState } from "react";
 import { supabase } from "../utils/supabase";
 
@@ -5,9 +9,6 @@ interface LoginPopupProps {
   onClose: () => void;
 }
 
-// ------------------------------------------------------------------------------------------------
-// > LOGINPOPUP COMPONENT < //
-// ------------------------------------------------------------------------------------------------
 const LoginPopup: React.FC<LoginPopupProps> = ({ onClose }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");

@@ -1,7 +1,9 @@
-// client/src/components/WeatherComponent.tsx
+// --------------------------------------------------------------------------------------
+// > WEATHER COMPONENT < //
+// --------------------------------------------------------------------------------------
 
 import React, { useEffect, useState } from "react";
-import axios from "axios"; // Import Axios
+import axios from "axios";
 
 interface WeatherData {
   temperature: number;
@@ -9,7 +11,7 @@ interface WeatherData {
   weatherCode: number;
 }
 
-// Find city name based on lat/lon
+// FIND CITY NAME BASED ON LAT/LON
 interface NominatimResult {
   display_name: string;
   address: {
@@ -50,14 +52,14 @@ const WeatherComponent: React.FC = () => {
             if (geoResp.data.address) {
               const { city, town, village, county, state } =
                 geoResp.data.address;
-              // prefer city/town/village first, fallback to county if no city
+              // PREFER CITY/TOWN/VILLAGE FIRST, FALLBACK TO COUNTY IF NO CITY
               const cityName =
                 city || town || village || county || "Unknown City";
               const stateName = state || "Unknown State/Province";
 
               setLocationName(`${cityName}, ${stateName}`);
             } else {
-              // fallback if address is missing
+              // FALLBACK IF ADDRESS IS MISSING
               setLocationName("Unknown City, Unknown State");
             }
           } catch (err) {
@@ -86,7 +88,7 @@ const WeatherComponent: React.FC = () => {
   if (!weather) return null;
 
   const { temperature, description, weatherCode } = weather;
-  const temp = Math.round(temperature); // remove integers from temp
+  const temp = Math.round(temperature); // * remove integers from temp
   const imgUrl = "./src/assets/";
 
   const iconMapping: Record<number, string> = {
@@ -145,4 +147,7 @@ const WeatherComponent: React.FC = () => {
   );
 };
 
+// ------------------------------------------------------------------------------------------------
+// * MODULE EXPORT
+// ------------------------------------------------------------------------------------------------
 export default WeatherComponent;
