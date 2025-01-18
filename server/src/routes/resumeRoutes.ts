@@ -91,7 +91,6 @@ router.post(
             content: `Please provide a high level brief but complete AI feedback on the resume, no more than 150 words. Ensure you cover key sections like Clarity, Organization, Technical Skills, relevant achievements, and how best to optimize it to being ATS compliant, but keep it to 1–2 paragraphs. Analyze the following resume and provide feedback:\n\n${resumeText}`,
           },
         ],
-        // max_tokens: 500,
       });
 
       const analysisFeedback =
@@ -106,15 +105,14 @@ router.post(
         .insert([
           {
             user_id: userId,
-            title: req.body.title || file.originalname.split(".")[0],
+            title,
             content: resumeText, // parsed PDF text
             file_url: uniqueFilename,
-            // improved_resume_text: analysisFeedback, // Consistent field name
-            ai_resume_analysis: analysisFeedback,
+            ai_resume_analysis: analysisFeedback, // Short analysis summary
           },
         ])
-        .select("*") // Ensure the inserted resume is returned
-        .single(); // Return a single object
+        .select("*")
+        .single();
 
       if (dbError) {
         console.error("Error saving resume to database:", dbError);
@@ -122,13 +120,13 @@ router.post(
         return;
       }
 
-      console.log("Inserted Resume Data:", dbData); // New log
+      console.log("Inserted Resume Data:", dbData);
 
       res.status(200).json({
         message: "Resume uploaded successfully",
         fileUrl: signedUrlData?.signedUrl,
         analysisFeedback,
-        insertedResume: dbData, // Now contains the inserted resume
+        insertedResume: dbData,
       });
 
       console.log("Resume uploaded and processed successfully.");
@@ -142,20 +140,21 @@ router.post(
 );
 
 // ------------------------------------------------------------------------------------------------
-// > // IMPROVE ROUTE // - AI REWRITE RESUME TO ALIGN W/JOB DESCRIPTION; STORE IN DB
+// > // IMPROVE ROUTE // - AI REWRITE RESUME TO ALIGN W/JOB DESCRIPTION; STORE IN APPLICATIONS
 // ------------------------------------------------------------------------------------------------
-router.post("/improve", async (req: Request, res: Response) => {
+router.post("/improve", async (req: Request, res: Response): Promise<void> => {
   try {
-    const { resumeId, jobDesc, resumeText } = req.body;
+    const { applicationId, jobDesc, resumeText } = req.body;
 
-    if (!resumeId || !jobDesc || !resumeText) {
+    if (!applicationId || !jobDesc || !resumeText) {
       res.status(400).json({
         error:
-          "Missing 'resumeId', 'jobDesc' and/or 'resumeText' in request body",
+          "Missing 'applicationId', 'jobDesc' and/or 'resumeText' in request body",
       });
       return;
     }
 
+    // >>> CALL OPENAI TO IMPROVE RESUME <<<
     const response = await openAi.chat.completions.create({
       model: "o1-mini",
       messages: [
@@ -164,26 +163,29 @@ router.post("/improve", async (req: Request, res: Response) => {
           content: `Here is a resume:\n\n${resumeText}\n\nJob Description:\n${jobDesc}\n\nRewrite this resume so it is ATS compliant and aligned with the job, without losing key details, Return the updated resume.`,
         },
       ],
-      // max_tokens: 500,
     });
 
     const improvedResume = response.choices?.[0].message?.content?.trim() || "";
 
-    const { data: updatedData, error: updateError } = await supabase
-      .from("resumes")
+    const { data: updatedApp, error: updateError } = await supabase
+      .from("applications")
       .update({ improved_resume_text: improvedResume })
-      .eq("id", resumeId)
+      .eq("id", applicationId)
       .select("*")
       .single();
 
     if (updateError) {
-      console.error("Failed to update improved resume in DB:", updateError);
+      console.error(
+        "Failed to update application with improved text:",
+        updateError,
+      );
       res
         .status(500)
         .json({ error: "Failed to store improved resume into DB" });
+      return;
     }
 
-    res.json({ improvedResume, updatedResume: updatedData });
+    res.json({ improvedResume, application: updatedApp });
     return;
   } catch (err) {
     console.error("Error improving resume:", err);
@@ -207,7 +209,7 @@ router.get("/", async (req: Request, res: Response) => {
       .from("resumes")
       .select("*")
       .eq("user_id", userId)
-      .order("created_at", { ascending: true }); // Ensure resumes are ordered
+      .order("created_at", { ascending: false });
 
     if (error) {
       console.error("Database fetch error:", error);

@@ -11,7 +11,6 @@ interface Resume {
   id: string;
   title: string;
   content: string;
-  improved_resume_text?: string;
 }
 
 interface Company {
@@ -74,17 +73,18 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
       let finalResumeId = selectedResumeId;
       let resumeContent = "";
 
-      // * If adding a new resume, trigger the upload via ResumeUpload ref
+      // ------------------------------------------------------------------
+      // 1) If adding a new resume, trigger the upload via ResumeUpload ref
+      // ------------------------------------------------------------------
       if (isAddNewResume) {
         if (resumeUploadRef.current) {
           console.log("Triggering resume upload...");
           // TRIGGER THE UPLOAD AND AWAIT ITS COMPLETION
           await resumeUploadRef.current.uploadResume();
-          // ASSUME ONUPLOADSUCCESS HAS UPDATED THE RESUMES VIA ONREFRESHDATA
-          // FETCH THE LATEST RESUMES
+          // FETCH UPDATED RESUMES (the parent might do this in onRefreshData)
           await onRefreshData();
 
-          //*  Find the newly uploaded resume (assuming it's the last one)
+          // Find the newly uploaded resume (assuming it's last or so)
           const updatedResumes = await fetch(
             `${baseUrl}/api/resumes?userId=${userId}`,
           )
@@ -94,7 +94,7 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
               return [];
             });
 
-          const latestResume = updatedResumes[updatedResumes.length - 1];
+          const latestResume = updatedResumes[0]; // since we order by created_at DESC
           if (latestResume) {
             finalResumeId = latestResume.id;
             resumeContent = latestResume.content;
@@ -106,7 +106,7 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
           throw new Error("ResumeUpload component is not available.");
         }
       } else {
-        // * Using existing resume
+        // Using existing resume
         const resumeObj = resumes.find((r) => r.id === finalResumeId);
         if (resumeObj) {
           resumeContent = resumeObj.content;
@@ -116,7 +116,9 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
         console.log("Using existing resume ID:", finalResumeId);
       }
 
-      // * Create or select companyId
+      // ------------------------------------------------------------------
+      // 2) Create or select companyId
+      // ------------------------------------------------------------------
       let finalCompanyId = selectedCompanyId;
       if (isAddNewCompany && newCompanyName.trim()) {
         console.log("Creating new company with name:", newCompanyName);
@@ -130,7 +132,9 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
         console.log("Using existing companyId:", finalCompanyId);
       }
 
-      // * Create the job
+      // ------------------------------------------------------------------
+      // 3) Create the job
+      // ------------------------------------------------------------------
       console.log("Creating job with finalCompanyId =", finalCompanyId);
       const jobPayload = {
         userId,
@@ -150,10 +154,35 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
       }
       console.log("Created job:", createdJob);
 
-      // * Improve the resume
-      console.log("Improving resume for resumeId:", finalResumeId);
-      const improvePayload = {
+      // ------------------------------------------------------------------
+      // 4) Create the application (so we have applicationId)
+      // ------------------------------------------------------------------
+      console.log("Creating application referencing jobId:", createdJob.id);
+      const appPayload = {
+        userId,
         resumeId: finalResumeId,
+        jobId: createdJob.id,
+        status: "pending",
+        appliedAt: dateApplied,
+      };
+      console.log("appPayload =", appPayload);
+
+      const applicationRes = await axios.post(
+        `${baseUrl}/api/applications/create`,
+        appPayload,
+      );
+      const createdApplication = applicationRes.data?.application;
+      if (!createdApplication) {
+        throw new Error("Failed to create application record.");
+      }
+      console.log("Created application:", createdApplication);
+
+      // ------------------------------------------------------------------
+      // 5) Improve the resume => pass applicationId
+      // ------------------------------------------------------------------
+      console.log("Improving resume for applicationId:", createdApplication.id);
+      const improvePayload = {
+        applicationId: createdApplication.id, // note we use applicationId now
         jobDesc,
         resumeText: resumeContent,
       };
@@ -166,20 +195,9 @@ const AddApplicationPopup: React.FC<AddApplicationPopupProps> = ({
       console.log("improveRes.data =", improveRes.data);
       const improvedText = improveRes.data?.improvedResume || "";
 
-      // * Create the application
-      console.log("Creating application referencing jobId:", createdJob.id);
-      const appPayload = {
-        userId,
-        resumeId: finalResumeId,
-        jobId: createdJob.id,
-        status: "pending",
-        appliedAt: dateApplied,
-      };
-      console.log("appPayload =", appPayload);
-
-      await axios.post(`${baseUrl}/api/applications/create`, appPayload);
-      console.log("Application created successfully.");
-
+      // ------------------------------------------------------------------
+      // 6) Done
+      // ------------------------------------------------------------------
       setImprovedResume(improvedText);
       console.log("==== SUBMIT FINISH SUCCESS ====");
       onRefreshData();

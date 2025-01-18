@@ -1,7 +1,9 @@
-// client/src/components/Dashboard.tsx
+// --------------------------------------------------------------------------------------
+// > DASHBOARD COMPONENT < //
+// --------------------------------------------------------------------------------------
 
 import React, { useEffect, useState, useCallback } from "react";
-import ResumeUpload from "./ResumeUpload";
+// import ResumeUpload from "./ResumeUpload";
 import { supabase } from "../utils/supabase";
 import Weather from "./Weather";
 import { Session } from "@supabase/supabase-js";
@@ -21,8 +23,7 @@ interface Resume {
   title: string;
   created_at: string;
   content: string;
-  improved_resume_text?: string; // Consistent field name
-  ai_resume_analysis?: string;
+  ai_resume_analysis?: string; // Short feedback from /upload
 }
 
 interface Company {
@@ -33,10 +34,6 @@ interface Company {
   notes?: string;
   created_at?: string;
 }
-
-// --------------------------------------------------------------------------------------
-// > DASHBOARD COMPONENT < //
-// --------------------------------------------------------------------------------------
 
 const Dashboard: React.FC<DashboardProps> = ({ session }) => {
   const [resumes, setResumes] = useState<Resume[]>([]);
@@ -69,7 +66,7 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
       .from("resumes")
       .select("*")
       .eq("user_id", userId)
-      .order("created_at", { ascending: false }); // Ensure resumes are ordered
+      .order("created_at", { ascending: false }); // newest first
 
     if (error) {
       console.error("Error fetching resumes:", error.message);
@@ -78,7 +75,8 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
       if (data && data.length > 0) {
         const latestResume = data[0];
         console.log("Latest Resume:", latestResume); // Log for verification
-        setLatestFeedback(latestResume.ai_resume_analysis || null); // Set latest feedback
+        // This is just the short "analysis" from the upload route
+        setLatestFeedback(latestResume.ai_resume_analysis || null);
       } else {
         setLatestFeedback(null);
       }
@@ -188,7 +186,6 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
 
   // If you want to re-fetch data after the user submits the form
   const handleRefreshData = () => {
-    // Re-fetch resumes
     fetchResumes();
     setShowPopup(false);
   };
@@ -337,9 +334,8 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
                 )}
               </div>
             </section>
-            {/* ADD SOMETHING HERE within the section; Weather moved to right?!?!?!?!?! */}
             <section className="magic-card h-auto">
-              <p className="card-title">R-Card1</p>
+              <p className="card-title">L-Card1</p>
             </section>
           </aside>
 
@@ -349,7 +345,6 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
             <div className="magic-card">
               <h2 className="card-title text-3xl">APPLICATIONS</h2>
               {/* ResumeUpload is managed via AddApplicationPopup */}
-
               {/* ResumeAnalysis Component */}
               <div className="mt-6">
                 <ResumeAnalysis feedback={latestFeedback} />
@@ -361,7 +356,6 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
               <div className="magic-card">
                 <p className="card-title">C-Card2</p>
               </div>
-
               {/* RECENT ACTIVITY CARD */}
               <div className="magic-card">
                 <h2 className="card-title">Recent Activity</h2>
@@ -384,11 +378,11 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
               <div className="mt-10 flex flex-col items-center justify-center gap-5">
                 {jobSearch.map((website) => (
                   <a
-                    key={website.name} // Added key here for React list rendering
+                    key={website.name}
                     title={website.name}
                     href={website.href}
-                    target="_blank" // open in a new tab
-                    rel="noopener noreferrer" // best practice for external links
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     <img
                       src={website.src}
@@ -405,11 +399,11 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
               <div className="mt-10 flex flex-col items-center justify-center gap-5">
                 {skillBuilding.map((skill) => (
                   <a
-                    key={skill.name} // Added key here for React list rendering
+                    key={skill.name}
                     title={skill.name}
                     href={skill.href}
-                    target="_blank" // open in a new tab
-                    rel="noopener noreferrer" // best practice for external links
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     <img
                       src={skill.src}
