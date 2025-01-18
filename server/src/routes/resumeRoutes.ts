@@ -88,7 +88,12 @@ router.post(
         messages: [
           {
             role: "user",
-            content: `Please provide a high level brief but complete AI feedback on the resume, no more than 150 words. Ensure you cover key sections like Clarity, Organization, Technical Skills, relevant achievements, and how best to optimize it to being ATS compliant, but keep it to 1–2 paragraphs. Analyze the following resume and provide feedback:\n\n${resumeText}`,
+            content: `Please analyze the following resume and provide a short, high-level critique under 60 words total. Focus on clarity, organization, technical skills, relevant achievements, and ATS optimization. Within your summary, include:
+                    - Up to 3 positive bullet points (each max 1 sentence).
+                    - Up to 3 improvement bullet points (each max 1 sentence).
+                    Format each bullet point with a bullet. Each new bullet point should have space in between. Here is the resume text: \n\n
+
+                    ${resumeText}`,
           },
         ],
       });
@@ -160,7 +165,7 @@ router.post("/improve", async (req: Request, res: Response): Promise<void> => {
       messages: [
         {
           role: "user",
-          content: `Here is a resume:\n\n${resumeText}\n\nJob Description:\n${jobDesc}\n\nRewrite this resume so it is ATS compliant and aligned with the job, without losing key details, Return the updated resume.`,
+          content: `Here is a current resume:\n\n${resumeText}\n\nAnd here is the job description:\n${jobDesc}\n\nPlease rewrite this resume to be a single-page, ATS-compliant document specifically tailored to a software engineering role at a top-tier (FAANG or FAANG-adjacent) company. Ensure the following:\n\n1. Highlight the candidate’s most relevant technical skills, accomplishments, and experiences that align with the job description.\n2. Retain all key details, but trim any filler or outdated info to keep it concise.\n3. Use a clear, structured format (with headings, sections, bullet points, etc.) so it converts neatly into a PDF.\n4. Incorporate industry keywords and action verbs to maximize ATS compatibility.\n5. Emphasize achievements, impact, and metrics where possible.\n6. Preserve the candidate’s unique selling points but make it look polished and professional.\n\nReturn only the fully rewritten resume text, properly formatted for a PDF, in one page.`,
         },
       ],
     });
