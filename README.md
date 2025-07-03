@@ -11,11 +11,15 @@
 ![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)
 ![Spline](https://img.shields.io/badge/Spline-FF6B6B?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyQzIgMTcuNTIgNi40OCAyMiAxMiAyMkMxNy41MiAyMiAyMiAxNy41MiAyMiAxMkMyMiA2LjQ4IDE3LjUyIDIgMTIgMloiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPg==)
 
-## Overview
+## OVERVIEW
 
 LyraX is a comprehensive web application designed to help job seekers optimize their resumes for specific job applications using AI technology. The platform streamlines the entire job application process by providing intelligent resume analysis, ATS optimization, and centralized application tracking.
 
-## Key Features
+**Demo Watch the full walkthrough video on YouTube:**
+
+[![YouTube Demo](https://img.shields.io/badge/YouTube-Demo-red?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/JbGI02NdLDU)
+
+## FEATURES
 
 ### 🤖 AI Powered Resume Enhancement
 
@@ -34,6 +38,7 @@ LyraX is a comprehensive web application designed to help job seekers optimize t
 - **PDF Processing**: Utilizes pdf-parse library for accurate text extraction from resume PDFs
 - **Secure Storage**: Encrypted document storage via Supabase with version control for both original and enhanced resumes
 - **Easy Downloads**: Export AI optimized resumes as PDFs with a single click
+  R
 
 ### 🔐 Authentication & Security
 
@@ -48,7 +53,7 @@ LyraX is a comprehensive web application designed to help job seekers optimize t
 - **Weather Integration**: Includes a weather widget for a personalized dashboard experience
 - **Quick Access**: Direct links to major job boards and skill building platforms
 
-## Technology Stack
+## STACK
 
 ### Frontend
 
@@ -90,7 +95,7 @@ LyraX is a comprehensive web application designed to help job seekers optimize t
 - **Weather**: Tomorrow.io API for real-time weather data
 - **AI Processing**: OpenAI GPT models for resume analysis
 
-## Getting Started
+## GETTING STARTED
 
 ### Prerequisites
 
@@ -174,7 +179,7 @@ npm run dev
 
 The application will be available at `http://localhost:5173`
 
-## Usage
+## USAGE
 
 1. **Sign Up/Login**: Create an account using email or OAuth providers
 2. **Upload Resume**: Upload your base resume as a PDF
@@ -187,7 +192,7 @@ The application will be available at `http://localhost:5173`
 5. **Track Progress**: Update application status, add interview notes, and manage contacts
 6. **Download**: Export your AI-optimized resume as a PDF
 
-## Project Structure
+## PROJECT STRUCTURE
 
 ```
 lyrax/
@@ -206,7 +211,7 @@ lyrax/
 └── README.md
 ```
 
-## API Endpoints
+## API ENDPOINTS
 
 - `POST /api/resumes/upload` - Upload and analyze resume
 - `POST /api/resumes/improve` - Generate job-specific resume
@@ -217,10 +222,10 @@ lyrax/
 - `POST /api/jobs/create` - Create job posting
 - `GET /api/weather` - Fetch weather data
 
-## Contributing
+## CONTRIBUTING
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
+## LICENSE
 
 This project is licensed under the MIT License - see the LICENSE file for details.
