@@ -1,7 +1,7 @@
 <div align="center">
   <img src="client/src/assets/SplashScreen.gif" alt="LyraX Splash Screen" />
 
-  <h1 style="font-size: 3em;" align="center">LyraX – AI Powered Resume Optimization</h1>
+  <h1 style="font-size: 3em;" align="center">LYRA – AI Powered Resume Optimization</h1>
 
   <p>
     <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
