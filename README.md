@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="client/src/assets/SplashScreen.gif" alt="LyraX Splash Screen" />
+  <img src="client/src/assets/SplashScreen.gif" alt="Lyra Splash Screen" />
 
   <h1 style="font-size: 3em;" align="center">LYRA – AI Powered Resume Optimization</h1>
 
@@ -21,7 +21,7 @@
 
 ## OVERVIEW
 
-LyraX is a comprehensive web application designed to help job seekers optimize their resumes for specific job applications using AI technology. The platform streamlines the entire job application process by providing intelligent resume analysis, ATS optimization, and centralized application tracking.
+Lyra is a comprehensive web application designed to help job seekers optimize their resumes for specific job applications using AI technology. The platform streamlines the entire job application process by providing intelligent resume analysis, ATS optimization, and centralized application tracking.
 
 **Demo Watch the full walkthrough video on YouTube:**
 
